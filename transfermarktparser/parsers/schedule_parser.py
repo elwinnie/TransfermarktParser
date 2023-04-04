@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 
 from bs4 import BeautifulSoup, Tag
@@ -7,7 +8,7 @@ from transfermarktparser.utils.text_handler import TextHandler
 
 
 class ScheduleParser:
-    def parse(self, page: [str | bytes]) -> list[Match]:
+    async def parse(self, page: [str | bytes]) -> list[Match]:
         soup = BeautifulSoup(page, "lxml")
         if not self._check_valid_season(soup):
             print("Season isn't valid.")

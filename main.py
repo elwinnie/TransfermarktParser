@@ -7,7 +7,6 @@ base_url = "https://www.transfermarkt.com/x/gesamtspielplan/wettbewerb/{league}/
 urls = [base_url.format(league=league, year=year) for league in leagues for year in years]
 
 if __name__ == "__main__":
-    tfp = TransfermarktParser()
-    result = tfp.get_schedule(urls)
+    result = TransfermarktParser.get_matches(leagues, years)
     writer = DataWriter()
     writer.to_csv(result, filename="schedule")

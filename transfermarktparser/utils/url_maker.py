@@ -1,5 +1,11 @@
 class UrlMaker:
-    _SCHEDULE_URL = "https://www.transfermarkt.com/x/gesamtspielplan/wettbewerb/{league}/saison_id/{year}"
+    _SCHEDULE_URL = "https://www.transfermarkt.com/x/gesamtspielplan/wettbewerb/{league_id}/saison_id/{year}"
 
-    @staticmethod
-    def get_schedule_url(league_id: str, year: int) -> str:
+    @classmethod
+    def get_schedule_urls(cls, league_ids: list[str], years: list[int]) -> list[str]:
+        urls = []
+        for league_id in league_ids:
+            for year in years:
+                url = cls._SCHEDULE_URL.format(league_id=league_id, year=year)
+                urls.append(url)
+        return urls
