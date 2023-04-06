@@ -4,7 +4,7 @@ from pathlib import Path
 from dataclasses import dataclass, asdict
 
 
-class DataWriter:
+class DataExporter:
     _DATA_PATH = Path("data")
 
     def to_csv(self, data: list[dataclass], filename: str, use_timestamp: bool = True) -> None:

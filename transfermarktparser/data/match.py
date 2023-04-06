@@ -22,6 +22,7 @@ class Match:
     home_id: int
     away_id: int
     summary_id: int
+    league_id: str
 
     @property
     def is_result(self):
