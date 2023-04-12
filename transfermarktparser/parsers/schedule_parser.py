@@ -1,6 +1,3 @@
-import asyncio
-from datetime import datetime
-
 from bs4 import BeautifulSoup, Tag
 
 from transfermarktparser.data.match import Match
@@ -8,14 +5,13 @@ from transfermarktparser.utils.text_handler import TextHandler
 
 
 class ScheduleParser:
-    def parse_matches(self, page: str, searched_matches: list[dict] = None) -> list[Match]:
+    def parse(self, page: str) -> list[Match]:
         soup = BeautifulSoup(page, "lxml")
         if not self._is_valid_season(soup):
             print("Season isn't valid.")
             return []
-        games = self._parse_games(soup, searched_matches)
 
-        return games
+        return self._parse_games(soup)
 
     def _parse_league_info(self, soup: BeautifulSoup) -> tuple[str | None, str | None, int | None,
                                                                int | None, str | None]:
@@ -46,63 +42,53 @@ class ScheduleParser:
                 print("League level is unknown")
                 return None
 
-    def _parse_games(self, soup: BeautifulSoup, searched_matches: list[dict] | None) -> list[Match]:
+    def _parse_games(self, soup: BeautifulSoup) -> list[Match]:
         games = []
         league, country, level, season, league_id = self._parse_league_info(soup)
-        matchday_blocks = soup("div", class_="row")[1].find_all("div", recursive=False)[1:]
-        for matchday_block in matchday_blocks:
-            tour = int(matchday_block.find("div", class_="content-box-headline").text.split(".")[0])
-            game_blocks = matchday_block.find("tbody").find_all("tr", class_="")
+        matchdays = soup("div", class_="row")[1].find_all("div", recursive=False)[1:]
+        matches = [match for matchday in matchdays for match in matchday.find("tbody").find_all("tr", class_="")]
+        previous_date, previous_time = None, None
+        for match in matches:
+            game = self._parse_game(match)
+            previous_date = game["date"] if game["date"] else previous_date
+            previous_time = game["time"] if game["time"] else previous_time
 
-            previous_time = None
-            previous_date = None
-            for game_block in game_blocks:
-                game = self._parse_game(game_block, previous_date, previous_time)
-
-                if searched_matches is not None:
-                    for searched_match in searched_matches:
-                        if searched_match["home_team"] == game["home_team"] and \
-                                searched_match["away_team"] == game["away_team"]:
-                            searched_matches.remove(searched_match)
-                            break
-                    else:
-                        continue
-
-                previous_time, previous_date = game["time"], game["date"]
-                games.append(Match(
-                    league=league,
-                    country=country,
-                    level=level,
-                    season=season,
-                    league_id=league_id,
-                    date=game["date"],
-                    time=game["time"],
-                    tour=tour,
-                    home_team=game["home_team"],
-                    away_team=game["away_team"],
-                    home_score=game["home_score"],
-                    away_score=game["away_score"],
-                    home_id=game["home_id"],
-                    away_id=game["away_id"],
-                    summary_id=game["summary_id"],
-                ))
+            games.append(Match(
+                league=league,
+                country=country,
+                level=level,
+                season=season,
+                league_id=league_id,
+                date=previous_date,
+                time=previous_time,
+                tour=game["tour"],
+                home_team=game["home_team"],
+                away_team=game["away_team"],
+                home_score=game["home_score"],
+                away_score=game["away_score"],
+                home_id=game["home_id"],
+                away_id=game["away_id"],
+                match_id=game["summary_id"],
+            ))
         return games
 
     @staticmethod
-    def _parse_game(game_block: Tag, previous_date: datetime.date, previous_time: datetime.time) -> dict:
+    def _parse_game(game_block: Tag) -> dict:
+        tour = int(game_block.parent.parent.parent.find("div", class_="content-box-headline").text.split(".")[0])
+
         date = game_block("td")[0].text.strip()
-        if len(date) > 1:
+        if len(date) > 1 and not date.lower() == "unknown":
             date = date.split()[1].strip()
             date = TextHandler.parse_date(date)
         else:
-            date = previous_date
+            date = None
 
         time = game_block("td")[1].text
         if len(time) > 1:
             time = time.strip()
             time = TextHandler.parse_time(time)
         else:
-            time = previous_time
+            time = None
 
         home_team = game_block("td")[2].find("a")["title"].strip()
         if not (idx := home_team.find("(")) == -1:
@@ -117,7 +103,8 @@ class ScheduleParser:
         away_score = int(away_score) if away_score != "-" else None
         summary_id = int(game_block("td")[4].find("a")["href"].split("/")[-1])
 
-        return {"date": date,
+        return {"tour": tour,
+                "date": date,
                 "time": time,
                 "home_team": home_team,
                 "away_team": away_team,

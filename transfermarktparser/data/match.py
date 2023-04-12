@@ -1,5 +1,5 @@
 import datetime
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -21,7 +21,7 @@ class Match:
 
     home_id: int
     away_id: int
-    summary_id: int
+    match_id: int
     league_id: str
 
     @property

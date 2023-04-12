@@ -1,18 +1,18 @@
 import csv
-import datetime
 from pathlib import Path
 from dataclasses import dataclass, asdict
 
 
 class DataExporter:
     _DATA_PATH = Path("data")
+    _CSV_EXT = ".csv"
 
-    def to_csv(self, data: list[dataclass], filename: str, use_timestamp: bool = True) -> None:
-        if use_timestamp:
-            timestamp = datetime.datetime.now()
-            filename += f"_{timestamp.strftime('%d_%m_%Y_%H_%M')}"
-        filename += ".csv"
-        with open(self._DATA_PATH / filename, 'w', encoding="utf-8") as ouf:
+    def to_csv(self, data: list[dataclass], filename: str, timestamp: str | None = None, mode='w') -> None:
+        if timestamp:
+            filename += timestamp + self._CSV_EXT
+        else:
+            filename += self._CSV_EXT
+        with open(self._DATA_PATH / filename, mode, encoding="utf-8") as ouf:
             csv_writer = csv.writer(ouf)
             columns = asdict(data[0]).keys()
             csv_writer.writerow(columns)

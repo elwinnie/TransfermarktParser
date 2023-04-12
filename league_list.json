@@ -1,0 +1,62 @@
+[
+    {
+        "league_id": "RU1",
+        "start_year": 2013,
+        "end_year": 2022
+    },
+    {
+        "league_id": "GB1",
+        "start_year": 2011,
+        "end_year": 2022
+    },
+    {
+        "league_id": "L1",
+        "start_year": 2011,
+        "end_year": 2022
+    },
+    {
+        "league_id": "ES1",
+        "start_year": 2011,
+        "end_year": 2022
+    },
+    {
+        "league_id": "FR1",
+        "start_year": 2011,
+        "end_year": 2022
+    },
+    {
+        "league_id": "IT1",
+        "start_year": 2011,
+        "end_year": 2022
+    },
+    {
+        "league_id": "BE1",
+        "start_year": 2021,
+        "end_year": 2022
+    },
+    {
+        "league_id": "PO1",
+        "start_year": 2014,
+        "end_year": 2022
+    },
+    {
+        "league_id": "NL1",
+        "start_year": 2014,
+        "end_year": 2022
+    },
+    {
+        "league_id": "TR1",
+        "start_year": 2011,
+        "end_year": 2022
+    },
+    {
+        "league_id": "A1",
+        "start_year": 2011,
+        "end_year": 2022
+    },
+    {
+        "league_id": "GR1",
+        "start_year": 2017,
+        "end_year": 2022
+    }
+]
